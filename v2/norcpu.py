@@ -394,12 +394,18 @@ code_label("start")
 
 var("ch")
 var("t")
-var("xor_mask", secret_password_xor_mask)
-var("cmp_flag", 0)
+var("xor_mask")
+var("cmp_flag")
 
-var("ptr", "exchange")
-var("ptr2", "secret_password")
-var("i", len(secret_password))
+var("ptr")
+var("ptr2")
+var("i")
+
+MOVi("exchange", "ptr")
+MOVi("secret_password", "ptr2")
+MOVi(secret_password_xor_mask, "xor_mask")
+MOVi(0, "cmp_flag")
+MOVi(len(secret_password), "i")
 
 cmp_loop = next_label()
 code_label(cmp_loop)               # cmp_loop:
@@ -421,7 +427,9 @@ MOVi(0, "exchange_sz")
 ok_label = next_label()
 IS_0("cmp_flag")
 JZi(ok_label)
-EXITi(0)
+
+exit_label = next_label()
+JMPi(exit_label)
 
 code_label(ok_label)
 
@@ -446,6 +454,7 @@ ADD("i", "const_minus_1", "i")                # i = i - 1
 IS_0("i")
 JNZi(loop)
 
+code_label(exit_label)             # exit_label:
 EXITi(0x00)
 
 buffer(8)

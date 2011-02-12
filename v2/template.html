@@ -1,0 +1,134 @@
+﻿<html>
+<title>NORCPU hackme challenge, Version 2</title>
+<!--
+  NORCPU hackme challenge
+  Copyright (c) 2011 by Alexander Demin
+  Based on the original NORCPU by Alexander Peslyak
+  Version 2.0
+-->
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<script type="text/javascript">
+
+var mem = []
+
+var mem_0 = [
+$mem_js
+];
+
+function nor(a, b) {
+  var r = a | b
+  r = r ^ 0xFFFF;
+  return r & 0xFFFF
+}
+
+function norcpu() {
+  ip = $ip;
+  while (true) {
+    i = mem[ip];
+    a = mem[i + 0]
+    b = mem[i + 1]
+    r = mem[i + 2]
+    mem[ip] = i + 3
+    f = nor(mem[a], mem[b])
+    mem[r] = f
+    mem[$shift_reg] = ((f >> 15) & 1) | ((f & 0x7FFF) << 1)
+
+    if (r == $exit_reg) break;
+  }
+}
+
+function calc(password) {
+  mem = null;
+  mem = mem_0.slice(0);
+  
+  for (i = 0; i < password.length; ++i)
+    mem[$exchange + i] = password.charCodeAt(i);
+  mem[$exchange_sz] = password.length
+  
+  norcpu();
+  
+  var result = "";
+  for (i = 0; i < mem[$exchange_sz]; ++i)
+    result += String.fromCharCode(mem[$exchange + i]);
+  
+  if (result.length == 0)
+    result = "Wrong password!";
+    
+  return result;
+}
+
+function check() {
+  var password = document.getElementById('password').value;
+  if (password.length < 1 || password.length > 16) { 
+    alert("Password length must be from 1 to 16 characters.")
+    return;
+  }
+  var check = document.getElementById('check');
+  check.disabled = true;
+  var result = document.getElementById('result');
+  result.value = calc(password);
+  check.disabled = false;
+}
+</script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-3017739-17']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</head>
+<body>
+<h1>NORCPU hackme challenge, Version 2</h1>
+<p>
+<b>Problem statement</b>
+<p>
+This is a hackme puzzle. When you enter a password into the "Password" field
+and click on "Check" the value is checked by a special JavaScript program 
+embedded into this page.
+<p>
+If the password is wrong you'll see "Wrong password!" message in the "Result" 
+field. If the password is correct a special magic message will be printed there.
+<p>
+You have to find out that magic message.
+<p>
+Deadline is <b>31st of March 2011</b>. 
+After that date I will publish all the sources.
+<p>
+<b>Notes</b>
+<p>
+The hackme is written such way that knowing the algorithm it's possible to
+restore the password, and as the consequence - to find out the magic message.
+<p>
+This page was tested on Google Chrome 10+ only and may work slow on other
+browsers.
+<p>
+<b>Prize</b>
+<p>
+There is no prize this time. The <a href="http://demin.ws/norcpu/norcpu.html">previous challenge</a> has been solved quite quickly. This one is harder to solve and dedicated for the real geeks.
+But I will be happy to publish a name of the first person who submits the correct magic message. Please send your submissions to 
+<a href="mailto:alexander@demin.ws?subject=norcpu2">alexander@demin.ws</a>.
+<p>
+<b>References</b>
+<p>
+Last year I wrote a few posts about this approach
+(<a href="http://meta-coding.blogspot.com/2010/04/cpu-executing-just-one-operation.html">English</a>,
+<a href="http://easy-coding.blogspot.com/2010/03/blog-post_26.html">Русский</a>),
+described everything in details and gave the references to the original
+author of this idea.
+<hr />
+Password:<br />
+<input id="password" type="text" />
+<input id="check" type="button" onclick="check()" value="Check"/>
+<br />
+Result:<br />
+<input id="result" type="text" />
+</body>
+</html>

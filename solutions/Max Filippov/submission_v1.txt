@@ -1,0 +1,90 @@
+Fri, Feb 11, 2011 at 19:51
+==========================
+
+Algorithm that was used to check password correctness in the first round was the following:
+
+bool check(const char *p)
+{
+   int v = 0x1040;
+
+   for(; *p; ++p)
+   {
+       v ^= *p;
+       for (int i = 0; i < 8; ++i)
+       {
+           int f = v & 1;
+           v >>= 1;
+           if (f)
+               v ^= 0x1408;
+       }
+   }
+   return v == 0x1c89;
+}
+
+that is, sort of CRC.
+
+To discover it I've collected NORCPU execution trace and "disassembled" it.
+Modified NORCPU source and disassembler are attached, and also may be found there: http://jcmvbkbc.spb.ru/git/?p=dumb/norcpu.git;a=summary
+
+
+Fri, Feb 11, 2011 at 23:26
+==========================
+
+> I'm very please to confirm that the algorithm is correct. And I confirm this
+> hack. Could you please to describe your method? If you can and want.
+
+The method used is pretty straightforward:
+- collect execution trace;
+- recognize instruction patterns and collapse sequences of primitive instructions to more complex ones;
+- analyze disassembled trace.
+
+So, first I needed trace: I copied javascript text into cpp source, fixed lingual differences and inserted the following printf:
+ while (1) {
+   int i = mem[ip];
+   printf("%04x:NOR(%04x, %04x => %04x) ", i, mem[i], mem[i + 1], mem[i + 2]);
+   int a = mem[i + 0];
+
+so that I got a long line (about 8Mb) of primitive instruction execution trace.
+
+Then I started constructing sed script that would make it readable.
+First, it broke the trace linewise, one instruction per line (288323 lines, will read it in case of insomnia).
+I took a look at processed trace and recorded several obvious instruction patterns into sed.
+Then reran script, took next look, recorded more patterns,...
+This way I figured out all boolean logic commands and jumps.
+Then rotations left. Each time new command got recognized, new filtered processed trace was suggesting next step,
+e.g. 15 ROTL equals ROTR etc.
+
+Then I looked into your article at http://easy-coding.blogspot.com/2010/03/blog-post_26.html
+And found addition pattern in disassembly. And recorded it in sed script.
+
+After that I was able to just read the trace (which shrinked to 1035 lines).
+Its inner loop fit into one page, I just made some notes on a scratchpad:
+
+[f1ba]: current in-T index (i)
+[f1b4]: LEN
+[f1b5]: 8
+
+0012-0035:[f1b9] ^= (T[i] & 0xff)
+
+006d-007b:[f1b8] = [f1b9] & 1
+008a-0158:[f1b9] >>= 1
+0167-10c7:[f1aa] = [f1b8] + -1, [f1ab] = !carry
+10ca-10e6:jmp on carry to 1145:110d
+
+110d-111b:[f1b9] ^= 1408
+
+1145-1f4f:--[f1b5]
+20a5-3005:[f1aa] = [f1b5] + -1, f1ab = !carry
+3008-3024:jmp on carry to 006d:304b
+
+304b-304b:++i
+3fab-3fab:--LEN
+4f0b-5e8a:jmp on carry to 5eb1:6
+
+then I browsed through the repetitions of this inner loop and found the end of the outer loop.
+
+5eb1-6e74:check 1c89
+
+Then just translated it into C.
+It all took me three evenings.
+

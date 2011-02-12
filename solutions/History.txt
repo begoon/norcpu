@@ -1,0 +1,34 @@
+Wed, Feb 9, 2011 at 00:19
+-------------------------
+
+Vasiliy Artemev, problem #1, method: bruteforce.
+
+
+Wed, Feb 9, 2011 at 18:08
+--------------------------
+
+Anton Bukov, problem #2, method: discovered a bug in the implementation.
+
+
+Fri, Feb 11, 2011 at 01:51
+--------------------------
+
+a5b, problem #2, method: hot-patching and disassembling.
+
+
+Fri, Feb 11, 2011 at 19:51
+--------------------------
+
+Max Filippov, problem #1, method: tracing and analisys.
+
+
+Fri, Feb 11, 2011 at 22:07
+--------------------------
+
+Max Filippov, problem #1, method: tracing and analisys.
+
+
+Sat, Feb 12, 2011 at 06:18
+--------------------------
+
+Salo Kril, problem #1, method: tracing, analisys, code reconstruction.

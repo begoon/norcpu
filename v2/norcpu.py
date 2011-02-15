@@ -104,12 +104,10 @@ def word(value):
   data_segment.append("  dw %s" % printed)
   
 def buffer(length, value = -1):
-  global scrumble_counter
   for i in range(0, length):
     word(value)
 
 def var(name, value = -1):
-  global scrumble_counter
   data_label(name);
   word(value);
 

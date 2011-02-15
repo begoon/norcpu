@@ -25,7 +25,7 @@ Max Filippov, `problem #1`_, method: tracing and analisys.
 Fri, Feb 11, 2011 at 22:07
 --------------------------
 
-Max Filippov, `problem #1`_, method: tracing and analisys.
+Max Filippov, `problem #2`_, method: tracing and analisys.
 
 
 Sat, Feb 12, 2011 at 06:18

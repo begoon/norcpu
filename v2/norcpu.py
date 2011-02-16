@@ -2,7 +2,7 @@ import sys, re, time, string, binascii
 
 verbose = False
 verbose_cpu = False
-scrumble = True
+scramble = True
 
 secret_password = "h1cKmE1fUsAn"
 secret_password_xor_mask = 0x3401
@@ -85,17 +85,17 @@ def code(value):
     printed = "%d" % value
   code_segment.append("  dw %s" % printed)
  
-scrumble_counter = 0x2743
+scramble_counter = 0x2743
 
-def next_scrumble_counter():
-  global scrumble_counter
-  scrumble_counter = scrumble_counter * 3 + 7
-  return scrumble_counter & 0xffff
+def next_scramble_counter():
+  global scramble_counter
+  scramble_counter = scramble_counter * 3 + 7
+  return scramble_counter & 0xffff
 
 def word(value):
   if value == -1: 
-    if scrumble:
-      value = next_scrumble_counter()
+    if scramble:
+      value = next_scramble_counter()
     else:
       value = 0
   printed = value

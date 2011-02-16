@@ -2,7 +2,7 @@ import sys, re, time, string, binascii
 
 verbose = False
 verbose_cpu = False
-scrumble = True
+scramble = True
 
 test_wrong_crc = 0
 
@@ -112,17 +112,17 @@ def code(value):
     printed = "%d" % value
   code_segment.append("  dw %s" % printed)
  
-scrumble_counter = 0x27
+scramble_counter = 0x27
 
-def next_scrumble_counter():
-  global scrumble_counter
-  scrumble_counter = scrumble_counter * 3 + 7
-  return scrumble_counter & 0xff
+def next_scramble_counter():
+  global scramble_counter
+  scramble_counter = scramble_counter * 3 + 7
+  return scramble_counter & 0xff
 
 def word(value):
   if value == -1: 
-    if scrumble:
-      value = next_scrumble_counter()
+    if scramble:
+      value = next_scramble_counter()
     else:
       value = 0
   printed = value

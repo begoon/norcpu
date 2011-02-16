@@ -117,7 +117,7 @@ scramble_counter = 0x27
 def next_scramble_counter():
   global scramble_counter
   scramble_counter = scramble_counter * 3 + 7
-  return scramble_counter & 0xff
+  return scramble_counter & 0xffff
 
 def word(value):
   if value == -1: 
